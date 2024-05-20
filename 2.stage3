@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+set -ue
+
+#sudo tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
+sudo sh -c "echo 'GENTOO_MIRRORS="https://mirrors.bfsu.edu.cn/gentoo/"' >>/mnt/gentoo/etc/portage/make.conf"
+sudo cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
+sudo sh -c "genfstab -U /mnt/gentoo >> /mnt/gentoo/etc/fstab"
+sudo arch-chroot /mnt/gentoo

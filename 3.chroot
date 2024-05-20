@@ -1,0 +1,29 @@
+#!/usr/bin/env sh
+set -ue
+
+# binhost
+echo EMERGE_DEFAULT_OPTS=\"--binpkg-changed-deps=y --binpkg-respect-use=y --getbinpkg=y --rebuilt-binaries=y --usepkg-exclude \'acct-\*/\* sys-kernel/\* virtual/\* \*/\*-bin\'\"
+echo FEATURES=\"binpkg-request-signature\" >> /etc/portage/make.conf
+cat > /etc/portage/binrepos.conf/gentoobinhost.conf <<EOF
+[cnbinhost0]
+priority = 9999
+sync-uri = https://mirrors.bfsu.edu.cn/gentoo/releases/amd64/binpackages/23.0/x86-64/
+EOF
+
+# license
+mkdir -p /etc/portage/package.license
+echo 'sys-kernel/linux-firmware linux-fw-redistributable no-source-code' >/etc/portage/package.license/linux-firmware
+echo 'sys-kernel/installkernel dracut' >/etc/portage/package.use/installkernel
+
+# kernel
+emerge-websync
+emerge -av linux-firmware gentoo-kernel-bin lvm2 btrfs-progs grub net-misc/networkmanager
+
+# grub
+grub-install --target=x86_64-efi --efi-directory=/efi/ --bootloader-id=Gentoo
+sed -Ei '/^#?(GRUB_TIMEOUT=)/s/.$/1/' /etc/default/grub
+genkernel --lvm initramfs
+grub-mkconfig -o /boot/grub/grub.cfg
+
+# ready to enter the new system
+systemctl enable NetworkManager
