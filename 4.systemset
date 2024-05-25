@@ -6,5 +6,4 @@ hwclock --systohc
 sed -Ei 's/^#(en_US.UTF-8.*)/\1/' /etc/locale.gen
 locale-gen
 echo -e "LANG=en_US.UTF-8\nLC_COLLATE="C.UTF-8"" >> /etc/locale.conf
-echo Gengoo >>/etc/hostname
-env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
+echo Gengoo > /etc/hostname
